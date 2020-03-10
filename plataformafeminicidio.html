@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>PlataformaFeminicidio1</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="dc.css"/>
+    <script src="https:////cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" charset="utf-8"></script>
+    <script src="d3.js" charset="utf-8"></script>
+    <script src="http://dc-js.github.io/dc.js/js/crossfilter.js"></script>
+    <script src="http://dc-js.github.io/dc.js/js/dc.js"></script>
+    <script src="d3.v3.min.js"></script>
+
+ <link href="https://fonts.googleapis.com/css?family=Zilla+Slab+Highlight&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Teko|Zilla+Slab+Highlight&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Archivo|Teko|Zilla+Slab+Highlight&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Merriweather&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Merriweather|Roboto&display=swap" rel="stylesheet">
+
+
+</head>
+<style>
+	.dc-chart { font-size: 18px; 
+		color: white;}
+.dc-table-group { margin-top: 0px; padding-left: 10px; font-size: 12px; font-weight: bold; }
+.dc-table-column { margin-top: 0px; padding-left: 10px; font-size: 12px; font-weight: normal; }
+
+#chart-mencionespordia text{
+   fill:white;
+   font-family: 'Roboto', sans-serif;
+   font-size: 1em;
+}
+
+#chart-rango text{
+   fill:white;
+   font-family: 'Roboto', sans-serif;
+   font-size: 1em;
+}
+#chart-burbuja text{
+   fill:white;
+   font-family: 'Roboto', sans-serif;
+   font-size: 1em;
+}
+
+
+ 
+ h1 { font-family: 'Merriweather', sans-serif; 
+ color: #ffffff;
+}
+
+
+ h4 { font-family: 'Merriweather', sans-serif; 
+ color: #aa97ad;
+ padding-left: 20%;
+}
+
+ h5 { font-family: 'Merriweather', sans-serif; 
+ color: #aa97ad;
+}
+
+
+p {
+ color: #ffffff;
+}
+
+@font-face {
+    font-family: 'Zilla Slab Highlight'; /*a name to be used later*//*URL to font*/
+}
+
+	</style>
+<body style="background-color:#202124;">
+				<h1 align="center">Observatorio digital de feminicidio en redes sociales y medios</h1>
+	    	   				<h4 align="left">Trayectoria de las menciones en redes sociales y medios de comunicación:</h4>
+	    	   <div id="chart-mencionespordia" align="center"></div>
+	    	   <h4 align="left">[Selecciona un período de tiempo]:</h4>
+
+	    	   	    	  <div id="chart-rango" align="center"></div>
+	    	   	    	   <h4 align="left">Historias y tuits con mayor difusión:</h4>
+	    	  <div id="chart-burbuja" align="center"></div>
+	    	  <h4 align="left">Casos:</h4>
+	    	  <table id="mytable" width=70% align="center"><thead><tr><th><h5>Fecha</h5></th><th><h5>Fuente</h5></th><th><h5>Contenido</h5></th><th><h5>Url</h5></th><th><h5>Tráfico*</h5></th></tr></thead></table>
+	    	  
+</body>
+<script>
+var data = [
+{"date":"04/03/2020","quarter":"q1","fuente":"Periódico Victoria","titulo":"¡Otro feminicidio! Ahora es Hannia, tenía 16 años","tipo":"historia","popularidad":12,"relevancia":13,"ubicacion":"Victoria, Tamahulipas","url":"https://periodicovictoria.mx/mexico-y-el-mundo/otro-feminicidio-ahora-es-hannia-tenia-16-anos/","medios":80,"twitter":200},
+{"date":"03/03/2020","quarter":"q1","fuente":"El Imparcial","titulo":"Marciano abusó sexualmente y asesinó a una niña de 9 años; le dan prisión vitalicia","tipo":"historia","popularidad":40,"relevancia":12,"ubicacion":"Chalco, Estado de México","url":"http://www.elimparcial.com/mexico/Marciano-abuso-sexualmente-y-asesino-a-una-nina-de-9-anos-le-dan-prision-vitalicia-20200225-0079.html","medios":90,"twitter":210},
+{"date":"02/03/2020","quarter":"q1","fuente":"El Siglo de Torreón","titulo":"Feminicida acudió al funeral de su víctima en Baja California","tipo":"historia","popularidad":55,"relevancia":12,"ubicacion":"Torreòn, Coahuila","url":"https://www.elsiglodetorreon.com.mx/noticia/1677021.feminicida-acudio-al-funeral-de-su-victima-en-baja-california.html","medios":120,"twitter":180},
+{"date":"01/03/2020","quarter":"q1","fuente":"@wenmonterrosa","titulo":"En un país con las tasas de feminicidio más altas de América Latina (Cepal 2019), los medios de comunicación deben abordar este fenómeno con mucha responsabilidad. Es GRAVE que naturalicen la violencia contra la mujer.","tipo":"tuit","popularidad":27,"relevancia":16,"ubicacion":"El Salvador","url":"https://twitter.com/wenmonterrosa/status/1233410810141081600","medios":100,"twitter":250},
+{"date":"29/02/2020","quarter":"q1","fuente":"BBC News Mundo","titulo":"¿Qué pasa con los hijos de las víctimas de feminicidio en México, un país donde cada día 10 mujeres son asesinadas? Margarita es una de esas abuelas a las que les toca hacerse cargo de estos “huérfanos invisibles”.","tipo":"tuit","popularidad":60,"relevancia":10,"ubicacion":"México","url":"https://twitter.com/bbcmundo/status/1233160165379182594","medios":150,"twitter":300},
+{"date":"28/02/2020","quarter":"q1","fuente":"Alerta Ecatepec","titulo":"FEMINICIDIO #24: Asesinan 'por encargo' desde  un auto a una mujer y su pareja","tipo":"tuit","popularidad":50,"relevancia":10,"ubicacion":"Ecatepec, Estado de México","url":"https://twitter.com/Alerta_Ecatepec/status/1234571370614476801","medios":90,"twitter":270},
+{"date":"27/02/2020","quarter":"q1","fuente":"Noticieros Televisa","titulo":"Esta joven pide que las autoridades tomen medidas, pues teme ser víctima de feminicidio.","tipo":"tuit","popularidad":65,"relevancia":8,"ubicacion":"México","url":"https://twitter.com/NTelevisa_com/status/1234142968346562560","medios":75,"twitter":250},
+{"date":"26/02/2020","quarter":"q1","fuente":"Julio Astillero","titulo":"Emboscan en Ometepec a presunto jefe de banda delincuencial acusado de feminicidio","tipo":"tuit","popularidad":120,"relevancia":11,"ubicacion":"México","url":"https://twitter.com/julioastillero/status/1233489219261272075","medios":40,"twitter":220},
+{"date":"25/02/2020","quarter":"q1","fuente":"Foro TV","titulo":"Intento de feminicidio será considerado delito grave que amerita prisión automática","tipo":"tuit","popularidad":160,"relevancia":15,"ubicacion":"México","url":"https://twitter.com/Foro_TV/status/1234524366106394624","medios":70,"twitter":200}
+] 
+
+
+var parseDate = d3.time.format("%d/%m/%Y").parse;
+
+data.forEach(function(d) {
+	d.date = parseDate(d.date)
+	d.relevancia = +d.relevancia;
+	d.popularidad = +d.popularidad;	
+	d.week = d3.time.week(d.date); // pre-calculate month for better performance
+
+
+})
+
+
+
+
+/*
+CREATING CHARTS
+*/
+
+var mencionesChart = dc.lineChart('#chart-mencionespordia');
+var burbujaChart = dc.bubbleChart('#chart-burbuja')	
+var rangeChart = dc.barChart('#chart-rango')
+var dataTable = dc.dataTable("#mytable");
+var ndx = crossfilter(data);
+const all = ndx.groupAll();
+const numberFormat = d3.format('.2f');
+const moveMonths = ndx.dimension(d => d.week);
+
+
+var dateDim = ndx.dimension(function (d) {
+                return d.date; // IS this daily>? 
+        });
+
+var dateDim2 = ndx.dimension(function (d) {
+                return d.date; // IS this daily>? 
+        });
+
+var dateDim3 = ndx.dimension(function (d) {
+                return d.date; // IS this daily>? 
+        });
+
+const dateDimension = ndx.dimension(d => d.date);
+
+
+var mencionesmedios = dateDim.group().reduceSum(function(d) {return d.medios;});
+var mencionestwitter = dateDim.group().reduceSum(function(d) {return d.twitter;});
+
+
+const seleccion = dateDim.group().reduce(
+        /* callback for when data is added to the current filter results */
+        (p, v) => {
+            ++p.count;
+    		p.Indpopularidad += v.popularidad * 5;
+            p.IndRelevancia += v.relevancia * 5;
+            return p;
+        },
+        /* callback for when data is removed from the current filter results */
+        (p, v) => {
+            --p.count;
+    		p.Indpopularidad -= v.popularidad * 5;
+            p.IndRelevancia -= v.relevancia * 5;
+            return p;
+        },
+        /* initialize p */
+        () => ({
+            count: 0,
+            Indpopularidad: 0,
+            IndRelevancia: 0
+        })
+    );
+
+
+var minDate = new Date("01/01/2020");
+	var maxDate = new Date("01/04/2020");
+
+var grupo = moveMonths.group().reduceSum(function(d) {return d.medios;})
+
+
+rangeChart
+.width(990) /* dc.barChart('#monthly-volume-chart', 'chartGroup'); */
+        .height(90)
+        .margins({top: 0, right: 50, bottom: 20, left: 40})
+        .dimension(dateDim2)
+        .group(grupo)
+        .x(d3.time.scale().domain([new Date(2020, 0, 1), new Date(2020, 4, 1)]))
+       	.elasticY(true)
+        .xUnits(d3.time.day);
+
+
+
+
+mencionesChart
+	.width(990).height(200)
+	.dimension(dateDim)
+        .group(mencionesmedios,"Medios de comunicación")
+       .stack(mencionestwitter,"Twitter")
+      /**   .stack(hits_2013,"2013")   */
+        .renderArea(true)
+	.x(d3.time.scale().domain([minDate,maxDate]))
+	        .xUnits(d3.time.day)
+        .elasticX(true)
+                .elasticY(false)
+        .legend(dc.legend().x(60).y(10).itemHeight(13).gap(5))
+	.yAxisLabel("Menciones")
+	    .brushOn(false)
+  .rangeChart(rangeChart)
+	        .yAxis().ticks(4);
+
+
+
+
+
+burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
+        // (_optional_) define chart width, `default = 200`
+        .width(990)
+        // (_optional_) define chart height, `default = 200`
+        .height(250)
+        // (_optional_) define chart transition duration, `default = 750`
+        .transitionDuration(1500)
+        .margins({top: 10, right: 50, bottom: 30, left: 40})
+        .dimension(dateDimension)
+        //The bubble chart expects the groups are reduced to multiple values which are used
+        //to generate x, y, and radius for each key (bubble) in the group
+        .group(seleccion)      
+        // (_optional_) define color function or array for bubbles: [ColorBrewer](http://colorbrewer2.org/)
+       // .colors(d3.schemeRdYlGn[9])
+        //(optional) define color domain to match your data domain if you want to bind data or color
+        .colorDomain([-500, 500])
+        .ordinalColors(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628'])
+
+    //##### Accessors
+
+    //Accessor functions are applied to each value returned by the grouping
+
+        // `.colorAccessor` - the returned value will be passed to the `.colors()` scale to determine a fill color
+        .colorAccessor(d => d.value.Indpopularidad)
+        // `.keyAccessor` - the `X` value will be passed to the `.x()` scale to determine pixel location
+        .keyAccessor(p => p.value.IndRelevancia)
+        // `.valueAccessor` - the `Y` value will be passed to the `.y()` scale to determine pixel location
+        .valueAccessor(p => p.value.Indpopularidad)
+        // `.radiusValueAccessor` - the value will be passed to the `.r()` scale to determine radius size;
+        //   by default this maps linearly to [0,100]
+        .radiusValueAccessor(p => p.value.IndRelevancia)
+        .maxBubbleRelativeSize(0.10)
+        .x(d3.scale.linear().domain([0, 500]))
+        .y(d3.scale.linear().domain([0, 100]))
+        .r(d3.scale.linear().domain([0, 500]))
+        //##### Elastic Scaling
+
+        //`.elasticY` and `.elasticX` determine whether the chart should rescale each axis to fit the data.
+        .elasticY(true)
+        .elasticX(true)
+        //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
+        //domains as the Accessors.
+        .yAxisPadding(100)
+        .xAxisPadding(500)
+        // (_optional_) render horizontal grid lines, `default=false`
+        .renderHorizontalGridLines(true)
+        // (_optional_) render vertical grid lines, `default=false`
+        .renderVerticalGridLines(true)
+        // (_optional_) render an axis label below the x axis
+        .xAxisLabel('Popularidad')
+        // (_optional_) render a vertical axis lable left of the y axis
+        .yAxisLabel('Relevancia')
+
+        //##### Labels and  Titles
+
+        //Labels are displayed on the chart for each bubble. Titles displayed on mouseover.
+        // (_optional_) whether chart should render labels, `default = true`
+        .renderLabel(true)
+        .label(d => d.fuente)
+        // (_optional_) whether chart should render titles, `default = false`
+        .renderTitle(true)
+        .title(p => [
+            p.key,
+            `Relevancia: ${numberFormat(p.value.Indpopularidad)}`,
+            `Popularidad: ${numberFormat(p.value.IndRelevancia)}%`
+        ].join('\n'))
+        //#### Customize Axes
+
+        // Set a custom tick format. Both `.yAxis()` and `.xAxis()` return an axis object,
+        // so any additional method chaining applies to the axis, not the chart.
+        .yAxis().tickFormat(v => `${v}%`);
+
+
+dataTable
+    .width(768)
+    .height(480)
+    .showSections(false)
+    .dimension(dateDim3)
+    .group(function(d) {return "";})
+    .columns([function (d) { return d.date },
+    		  function (d) { return d.fuente },
+              function (d) { return d.titulo },
+              function (d) { return d.url },
+              function (d) { return d.twitter }])
+    .sortBy(function (d) { return +d.twitter })
+    .order(d3.descending);
+
+ d3.selectAll("text").style("fill","white");
+
+
+ dc.renderAll();
+</script>
+</html>

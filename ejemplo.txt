@@ -1,0 +1,56 @@
+var dataTable = dc.dataTable("#dc-table-graph");
+var timeChart = dc.lineChart("#dc-time-chart");
+
+
+
+
+
+const moveMonths = ndx.dimension(d => d.month);
+    // Group by total movement within month
+    const monthlyMoveGroup = moveMonths.group().reduceSum(d => Math.abs(d.close - d.open));
+
+
+
+var data = [
+    { Fecha: 2020-02-26, Twitter: 2733, Medios: 345},
+    { Fecha: 2020-02-27, Twitter: 2050, Medios: 208},
+    { Fecha: 2020-02-28, Twitter: 1932, Medios: 185},
+    { Fecha: 2020-02-29, Twitter: 1565, Medios: 92},
+    { Fecha: 2020-03-01, Twitter: 1466, Medios: 86},
+    { Fecha: 2020-03-02, Twitter: 2257, Medios: 223},
+    { Fecha: 2020-03-03, Twitter: 2148, Medios: 270},
+    { Fecha: 2020-03-04, Twitter: 3830, Medios: 170},
+];
+
+
+var ndx = crossfilter(menciones);
+
+var all = ndx.groupAll();
+
+var timeChart = dc.lineChart("#dc-time-chart");
+
+var parseDate = d3.time.format.utc("%Y-%m-%d").parse;
+
+
+data.forEach(function(d) {
+        d.Fecha = parseDate(d.Fecha);
+    });
+
+var minDate = transactionDate.bottom(1)[0].Fecha;
+var maxDate = transactionDate.top(1)[0].Fecha;
+
+timeChart
+.width(650)
+.height(250)
+.transitionDuration(1000)
+.brushOn(false)
+.dimension(transactionDate) //your dimension created from crossfilter
+.group(fakeTxnDateGroup) // your group
+.elasticY(true)
+.renderHorizontalGridLines(true)
+.renderVerticalGridLines(true)
+.x(d3.time.scale().domain([minDate,maxDate])) //these are the dates we created before this step so that the scale fits according to our data
+.yAxis().tickFormat(d3.format("s"))
+
+
+
