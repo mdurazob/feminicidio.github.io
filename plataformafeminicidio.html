@@ -6,8 +6,8 @@
     <link rel="stylesheet" type="text/css" href="dc.css"/>
     <script src="https:////cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" charset="utf-8"></script>
     <script src="d3.js" charset="utf-8"></script>
-    <script src="http://dc-js.github.io/dc.js/js/crossfilter.js"></script>
-    <script src="http://dc-js.github.io/dc.js/js/dc.js"></script>
+    <script src="https://dc-js.github.io/dc.js/js/crossfilter.js"></script>
+    <script src="https://dc-js.github.io/dc.js/js/dc.js"></script>
     <script src="d3.v3.min.js"></script>
 
  <link href="https://fonts.googleapis.com/css?family=Zilla+Slab+Highlight&display=swap" rel="stylesheet">
@@ -41,6 +41,25 @@
    font-size: 1em;
 }
 
+#chart-historias text{
+   fill:white;
+   font-family: 'Roboto', sans-serif;
+   font-size: 1em;
+}
+
+#chart-casos text{
+   fill:white;
+   font-family: 'Roboto', sans-serif;
+   font-size: 1em;
+}
+
+#chart-casos text{
+   fill:white;
+   font-family: 'Roboto', sans-serif;
+   font-size: 1em;
+}
+
+
 
  
  h1 { font-family: 'Merriweather', sans-serif; 
@@ -68,15 +87,21 @@ p {
 
 	</style>
 <body style="background-color:#202124;">
-				<h1 align="center">Observatorio digital de feminicidio en redes sociales y medios</h1>
+    <h1 align="center">Observatorio digital de feminicidio en redes sociales y medios</h1>
+    <h4 align="left">[Selecciona un período de tiempo]:</h4>
+
+                          <div id="chart-rango" align="center"></div>
+				
 	    	   				<h4 align="left">Trayectoria de las menciones en redes sociales y medios de comunicación:</h4>
 	    	   <div id="chart-mencionespordia" align="center"></div>
-	    	   <h4 align="left">[Selecciona un período de tiempo]:</h4>
-
-	    	   	    	  <div id="chart-rango" align="center"></div>
-	    	   	    	   <h4 align="left">Historias y tuits con mayor difusión:</h4>
+	    	   
+	    	   	    	   <h4 align="left">Historias con mayor difusión:</h4>
 	    	  <div id="chart-burbuja" align="center"></div>
-	    	  <h4 align="left">Casos:</h4>
+              <h4 align="left">Tuits con mayor difusión:</h4>
+              <div id="chart-historias" align="center"></div>
+              <h4 align="left">Casos registrados:</h4>
+              <div id="chart-casos" align="center"></div>
+	    	  <h4 align="left">Dataset:</h4>
 	    	  <table id="mytable" width=70% align="center"><thead><tr><th><h5>Fecha</h5></th><th><h5>Fuente</h5></th><th><h5>Contenido</h5></th><th><h5>Url</h5></th><th><h5>Tráfico*</h5></th></tr></thead></table>
 	    	  
 </body>
@@ -94,12 +119,14 @@ var data = [
 ] 
 
 
+
 var parseDate = d3.time.format("%d/%m/%Y").parse;
 
 data.forEach(function(d) {
 	d.date = parseDate(d.date)
 	d.relevancia = +d.relevancia;
 	d.popularidad = +d.popularidad;	
+    d.tipo = d.tipo;
 	d.week = d3.time.week(d.date); // pre-calculate month for better performance
 
 
@@ -113,7 +140,9 @@ CREATING CHARTS
 */
 
 var mencionesChart = dc.lineChart('#chart-mencionespordia');
+var historiasChart = dc.bubbleChart('#chart-historias') 
 var burbujaChart = dc.bubbleChart('#chart-burbuja')	
+var casosChart = dc.bubbleChart('#chart-casos') 
 var rangeChart = dc.barChart('#chart-rango')
 var dataTable = dc.dataTable("#mytable");
 var ndx = crossfilter(data);
@@ -134,11 +163,19 @@ var dateDim3 = ndx.dimension(function (d) {
                 return d.date; // IS this daily>? 
         });
 
+var dateDim4 = ndx.dimension(function (d) {
+                return d.date; // IS this daily>? 
+        });
+
 const dateDimension = ndx.dimension(d => d.date);
+const dateDimension2 = ndx.dimension(d => d.date);
+const dateDimension3 = ndx.dimension(d => d.tipo);
+
 
 
 var mencionesmedios = dateDim.group().reduceSum(function(d) {return d.medios;});
 var mencionestwitter = dateDim.group().reduceSum(function(d) {return d.twitter;});
+
 
 
 const seleccion = dateDim.group().reduce(
@@ -165,6 +202,7 @@ const seleccion = dateDim.group().reduce(
     );
 
 
+
 var minDate = new Date("01/01/2020");
 	var maxDate = new Date("01/04/2020");
 
@@ -177,7 +215,7 @@ rangeChart
         .margins({top: 0, right: 50, bottom: 20, left: 40})
         .dimension(dateDim2)
         .group(grupo)
-        .x(d3.time.scale().domain([new Date(2020, 0, 1), new Date(2020, 4, 1)]))
+        .x(d3.time.scale().domain([new Date(2020, 1, 25), new Date(2020, 2, 4)]))
        	.elasticY(true)
         .xUnits(d3.time.day);
 
@@ -230,16 +268,17 @@ burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         // `.colorAccessor` - the returned value will be passed to the `.colors()` scale to determine a fill color
         .colorAccessor(d => d.value.Indpopularidad)
         // `.keyAccessor` - the `X` value will be passed to the `.x()` scale to determine pixel location
-        .keyAccessor(p => p.value.IndRelevancia)
+        .keyAccessor(function(d) { return d.key; })
         // `.valueAccessor` - the `Y` value will be passed to the `.y()` scale to determine pixel location
         .valueAccessor(p => p.value.Indpopularidad)
         // `.radiusValueAccessor` - the value will be passed to the `.r()` scale to determine radius size;
         //   by default this maps linearly to [0,100]
         .radiusValueAccessor(p => p.value.IndRelevancia)
-        .maxBubbleRelativeSize(0.10)
-        .x(d3.scale.linear().domain([0, 500]))
+        .maxBubbleRelativeSize(0.05)
+      .x(d3.time.scale().domain( [ minDate,  maxDate ] ) )
+    .round(d3.time.day.round)
+    .xUnits(d3.time.days)
         .y(d3.scale.linear().domain([0, 100]))
-        .r(d3.scale.linear().domain([0, 500]))
         //##### Elastic Scaling
 
         //`.elasticY` and `.elasticX` determine whether the chart should rescale each axis to fit the data.
@@ -247,8 +286,7 @@ burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         .elasticX(true)
         //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
         //domains as the Accessors.
-        .yAxisPadding(100)
-        .xAxisPadding(500)
+     
         // (_optional_) render horizontal grid lines, `default=false`
         .renderHorizontalGridLines(true)
         // (_optional_) render vertical grid lines, `default=false`
@@ -277,6 +315,155 @@ burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         // so any additional method chaining applies to the axis, not the chart.
         .yAxis().tickFormat(v => `${v}%`);
 
+
+ historiasChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
+        // (_optional_) define chart width, `default = 200`
+        .width(990)
+        // (_optional_) define chart height, `default = 200`
+        .height(250)
+        // (_optional_) define chart transition duration, `default = 750`
+        .transitionDuration(1500)
+        .margins({top: 10, right: 50, bottom: 30, left: 40})
+        .dimension(dateDimension2)
+        //The bubble chart expects the groups are reduced to multiple values which are used
+        //to generate x, y, and radius for each key (bubble) in the group
+        .group(seleccion)      
+        // (_optional_) define color function or array for bubbles: [ColorBrewer](http://colorbrewer2.org/)
+       // .colors(d3.schemeRdYlGn[9])
+        //(optional) define color domain to match your data domain if you want to bind data or color
+        .colorDomain([-500, 500])
+        .ordinalColors(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628'])
+
+    //##### Accessors
+
+    //Accessor functions are applied to each value returned by the grouping
+
+        // `.colorAccessor` - the returned value will be passed to the `.colors()` scale to determine a fill color
+        .colorAccessor(d => d.value.Indpopularidad)
+        // `.keyAccessor` - the `X` value will be passed to the `.x()` scale to determine pixel location
+        .keyAccessor(function(d) { return d.key; })
+        // `.valueAccessor` - the `Y` value will be passed to the `.y()` scale to determine pixel location
+        .valueAccessor(p => p.value.Indpopularidad)
+        // `.radiusValueAccessor` - the value will be passed to the `.r()` scale to determine radius size;
+        //   by default this maps linearly to [0,100]
+        .radiusValueAccessor(p => p.value.IndRelevancia)
+        .maxBubbleRelativeSize(0.05)
+      .x(d3.time.scale().domain( [ minDate,  maxDate ] ) )
+    .round(d3.time.day.round)
+    .xUnits(d3.time.days)
+        .y(d3.scale.linear().domain([0, 100]))
+        //##### Elastic Scaling
+
+        //`.elasticY` and `.elasticX` determine whether the chart should rescale each axis to fit the data.
+        .elasticY(true)
+        .elasticX(true)
+        //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
+        //domains as the Accessors.
+     
+        // (_optional_) render horizontal grid lines, `default=false`
+        .renderHorizontalGridLines(true)
+        // (_optional_) render vertical grid lines, `default=false`
+        .renderVerticalGridLines(true)
+        // (_optional_) render an axis label below the x axis
+        .xAxisLabel('Popularidad')
+        // (_optional_) render a vertical axis lable left of the y axis
+        .yAxisLabel('Relevancia')
+
+        //##### Labels and  Titles
+
+        //Labels are displayed on the chart for each bubble. Titles displayed on mouseover.
+        // (_optional_) whether chart should render labels, `default = true`
+        .renderLabel(true)
+        .label(d => d.fuente)
+        // (_optional_) whether chart should render titles, `default = false`
+        .renderTitle(true)
+        .title(p => [
+            p.key,
+            `Relevancia: ${numberFormat(p.value.Indpopularidad)}`,
+            `Popularidad: ${numberFormat(p.value.IndRelevancia)}%`
+        ].join('\n'))
+        //#### Customize Axes
+
+        // Set a custom tick format. Both `.yAxis()` and `.xAxis()` return an axis object,
+        // so any additional method chaining applies to the axis, not the chart.
+        .yAxis().tickFormat(v => `${v}%`);
+
+
+ casosChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
+        // (_optional_) define chart width, `default = 200`
+       
+        .width(990)
+        // (_optional_) define chart height, `default = 200`
+        .height(250)
+        // (_optional_) define chart transition duration, `default = 750`
+        .transitionDuration(1500)
+        .margins({top: 10, right: 50, bottom: 30, left: 40})
+        .dimension(dateDimension3)
+        //The bubble chart expects the groups are reduced to multiple values which are used
+        //to generate x, y, and radius for each key (bubble) in the group
+        .group(seleccion)      
+        // (_optional_) define color function or array for bubbles: [ColorBrewer](http://colorbrewer2.org/)
+       // .colors(d3.schemeRdYlGn[9])
+        //(optional) define color domain to match your data domain if you want to bind data or color
+        .colorDomain([-500, 500])
+        .ordinalColors(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628'])
+
+    //##### Accessors
+
+    //Accessor functions are applied to each value returned by the grouping
+
+        // `.colorAccessor` - the returned value will be passed to the `.colors()` scale to determine a fill color
+        .colorAccessor(d => d.value.Indpopularidad)
+        // `.keyAccessor` - the `X` value will be passed to the `.x()` scale to determine pixel location
+        .keyAccessor(function(d) { return d.key; })
+        // `.valueAccessor` - the `Y` value will be passed to the `.y()` scale to determine pixel location
+        .valueAccessor(p => p.value.Indpopularidad)
+        // `.radiusValueAccessor` - the value will be passed to the `.r()` scale to determine radius size;
+        //   by default this maps linearly to [0,100]
+        .radiusValueAccessor(p => p.value.IndRelevancia)
+        .maxBubbleRelativeSize(0.05)
+      .x(d3.time.scale().domain( [ minDate,  maxDate ] ) )
+    .round(d3.time.day.round)
+    .xUnits(d3.time.days)
+        .y(d3.scale.linear().domain([0, 100]))
+        //##### Elastic Scaling
+
+        //`.elasticY` and `.elasticX` determine whether the chart should rescale each axis to fit the data.
+        .elasticY(true)
+        .elasticX(true)
+
+        //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
+        //domains as the Accessors.
+     
+        // (_optional_) render horizontal grid lines, `default=false`
+        .renderHorizontalGridLines(true)
+        // (_optional_) render vertical grid lines, `default=false`
+        .renderVerticalGridLines(true)
+        // (_optional_) render an axis label below the x axis
+        .xAxisLabel('Popularidad')
+        // (_optional_) render a vertical axis lable left of the y axis
+        .yAxisLabel('Relevancia')
+
+        //##### Labels and  Titles
+
+        //Labels are displayed on the chart for each bubble. Titles displayed on mouseover.
+        // (_optional_) whether chart should render labels, `default = true`
+        .renderLabel(true)
+        .label(d => d.fuente)
+        // (_optional_) whether chart should render titles, `default = false`
+        .renderTitle(true)
+        .title(p => [
+            p.key,
+            `Relevancia: ${numberFormat(p.value.Indpopularidad)}`,
+            `Popularidad: ${numberFormat(p.value.IndRelevancia)}%`
+        ].join('\n'))
+        //#### Customize Axes
+
+        // Set a custom tick format. Both `.yAxis()` and `.xAxis()` return an axis object,
+        // so any additional method chaining applies to the axis, not the chart.
+        .yAxis().tickFormat(v => `${v}%`);
+
+dateDimension3.filter("historia")
 
 dataTable
     .width(768)
