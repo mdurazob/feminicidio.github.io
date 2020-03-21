@@ -110,28 +110,60 @@ var data = [
 {"date":"04/03/2020","quarter":"q1","fuente":"Periódico Victoria","titulo":"¡Otro feminicidio! Ahora es Hannia, tenía 16 años","tipo":"historia","popularidad":12,"relevancia":13,"ubicacion":"Victoria, Tamahulipas","url":"https://periodicovictoria.mx/mexico-y-el-mundo/otro-feminicidio-ahora-es-hannia-tenia-16-anos/","medios":80,"twitter":200},
 {"date":"03/03/2020","quarter":"q1","fuente":"El Imparcial","titulo":"Marciano abusó sexualmente y asesinó a una niña de 9 años; le dan prisión vitalicia","tipo":"historia","popularidad":40,"relevancia":12,"ubicacion":"Chalco, Estado de México","url":"http://www.elimparcial.com/mexico/Marciano-abuso-sexualmente-y-asesino-a-una-nina-de-9-anos-le-dan-prision-vitalicia-20200225-0079.html","medios":90,"twitter":210},
 {"date":"02/03/2020","quarter":"q1","fuente":"El Siglo de Torreón","titulo":"Feminicida acudió al funeral de su víctima en Baja California","tipo":"historia","popularidad":55,"relevancia":12,"ubicacion":"Torreòn, Coahuila","url":"https://www.elsiglodetorreon.com.mx/noticia/1677021.feminicida-acudio-al-funeral-de-su-victima-en-baja-california.html","medios":120,"twitter":180},
-{"date":"01/03/2020","quarter":"q1","fuente":"@wenmonterrosa","titulo":"En un país con las tasas de feminicidio más altas de América Latina (Cepal 2019), los medios de comunicación deben abordar este fenómeno con mucha responsabilidad. Es GRAVE que naturalicen la violencia contra la mujer.","tipo":"tuit","popularidad":27,"relevancia":16,"ubicacion":"El Salvador","url":"https://twitter.com/wenmonterrosa/status/1233410810141081600","medios":100,"twitter":250},
-{"date":"29/02/2020","quarter":"q1","fuente":"BBC News Mundo","titulo":"¿Qué pasa con los hijos de las víctimas de feminicidio en México, un país donde cada día 10 mujeres son asesinadas? Margarita es una de esas abuelas a las que les toca hacerse cargo de estos “huérfanos invisibles”.","tipo":"tuit","popularidad":60,"relevancia":10,"ubicacion":"México","url":"https://twitter.com/bbcmundo/status/1233160165379182594","medios":150,"twitter":300},
-{"date":"28/02/2020","quarter":"q1","fuente":"Alerta Ecatepec","titulo":"FEMINICIDIO #24: Asesinan 'por encargo' desde  un auto a una mujer y su pareja","tipo":"tuit","popularidad":50,"relevancia":10,"ubicacion":"Ecatepec, Estado de México","url":"https://twitter.com/Alerta_Ecatepec/status/1234571370614476801","medios":90,"twitter":270},
+{"date":"01/03/2020","quarter":"q1","fuente":"@wenmonterrosa","titulo":"En un país con las tasas de feminicidio más altas de América Latina (Cepal 2019), los medios de comunicación deben abordar este fenómeno con mucha responsabilidad. Es GRAVE que naturalicen la violencia contra la mujer.","tipo":"tuit","popularidad":27,"relevancia":16,"ubicacion":"El Salvador","url":"https://twitter.com/wenmonterrosa/status/1233410810141081600","medios":100,"twitter":250}
+] 
+
+
+var datahistoria = [
 {"date":"27/02/2020","quarter":"q1","fuente":"Noticieros Televisa","titulo":"Esta joven pide que las autoridades tomen medidas, pues teme ser víctima de feminicidio.","tipo":"tuit","popularidad":65,"relevancia":8,"ubicacion":"México","url":"https://twitter.com/NTelevisa_com/status/1234142968346562560","medios":75,"twitter":250},
 {"date":"26/02/2020","quarter":"q1","fuente":"Julio Astillero","titulo":"Emboscan en Ometepec a presunto jefe de banda delincuencial acusado de feminicidio","tipo":"tuit","popularidad":120,"relevancia":11,"ubicacion":"México","url":"https://twitter.com/julioastillero/status/1233489219261272075","medios":40,"twitter":220},
 {"date":"25/02/2020","quarter":"q1","fuente":"Foro TV","titulo":"Intento de feminicidio será considerado delito grave que amerita prisión automática","tipo":"tuit","popularidad":160,"relevancia":15,"ubicacion":"México","url":"https://twitter.com/Foro_TV/status/1234524366106394624","medios":70,"twitter":200}
 ] 
 
+var datacasos = [
+{"date":"27/02/2020","quarter":"q1","fuente":"Noticieros Televisa","titulo":"Esta joven pide que las autoridades tomen medidas, pues teme ser víctima de feminicidio.","tipo":"tuit","popularidad":65,"relevancia":8,"ubicacion":"México","url":"https://twitter.com/NTelevisa_com/status/1234142968346562560","medios":75,"twitter":250},
+{"date":"26/02/2020","quarter":"q1","fuente":"Julio Astillero","titulo":"Emboscan en Ometepec a presunto jefe de banda delincuencial acusado de feminicidio","tipo":"tuit","popularidad":120,"relevancia":11,"ubicacion":"México","url":"https://twitter.com/julioastillero/status/1233489219261272075","medios":40,"twitter":220}
+] 
+
+
+
 
 
 var parseDate = d3.time.format("%d/%m/%Y").parse;
+
 
 data.forEach(function(d) {
 	d.date = parseDate(d.date)
 	d.relevancia = +d.relevancia;
 	d.popularidad = +d.popularidad;	
     d.tipo = d.tipo;
-	d.week = d3.time.week(d.date); // pre-calculate month for better performance
+// pre-calculate month for better performance
 
 
 })
 
+
+datahistoria.forEach(function(d) {
+    d.date = parseDate(d.date)
+    d.relevanciahistoria = +d.relevancia;
+    d.popularidadhistoria = +d.popularidad; 
+    d.tipohistoria = d.tipo;
+
+// pre-calculate month for better performance
+
+
+})
+
+datacasos.forEach(function(d) {
+    d.date = parseDate(d.date)
+    d.relevanciacasos = +d.relevancia;
+    d.popularidadcasos = +d.popularidad; 
+    d.tipocasos = d.tipo;
+
+// pre-calculate month for better performance
+
+
+})
 
 
 
@@ -146,6 +178,8 @@ var casosChart = dc.bubbleChart('#chart-casos')
 var rangeChart = dc.barChart('#chart-rango')
 var dataTable = dc.dataTable("#mytable");
 var ndx = crossfilter(data);
+var ndxdos = crossfilter(datahistoria);
+var ndxtres = crossfilter(datacasos);
 const all = ndx.groupAll();
 const numberFormat = d3.format('.2f');
 const moveMonths = ndx.dimension(d => d.week);
@@ -167,9 +201,9 @@ var dateDim4 = ndx.dimension(function (d) {
                 return d.date; // IS this daily>? 
         });
 
-const dateDimension = ndx.dimension(d => d.date);
+const dateDimension = ndxdos.dimension(d => d.date);
 const dateDimension2 = ndx.dimension(d => d.date);
-const dateDimension3 = ndx.dimension(d => d.date);
+const dateDimension3 = ndxtres.dimension(d => d.date);
 
 
 
@@ -178,7 +212,7 @@ var mencionestwitter = dateDim.group().reduceSum(function(d) {return d.twitter;}
 
 
 
-const seleccion = dateDim.group().reduce(
+const seleccion = dateDimension.group().reduce(
         /* callback for when data is added to the current filter results */
         (p, v) => {
             ++p.count;
@@ -201,6 +235,53 @@ const seleccion = dateDim.group().reduce(
         })
     );
 
+
+const selecciondos = dateDimension2.group().reduce(
+        /* callback for when data is added to the current filter results */
+        (p, v) => {
+            ++p.count;
+            p.Indpopularidad += v.popularidad * 5;
+            p.IndRelevancia += v.relevancia * 5;
+            return p;
+        },
+        /* callback for when data is removed from the current filter results */
+        (p, v) => {
+            --p.count;
+            p.Indpopularidad -= v.popularidad * 5;
+            p.IndRelevancia -= v.relevancia * 5;
+            return p;
+        },
+        /* initialize p */
+        () => ({
+            count: 0,
+            Indpopularidad: 0,
+            IndRelevancia: 0
+        })
+    );
+
+
+const selecciontres = dateDimension3.group().reduce(
+        /* callback for when data is added to the current filter results */
+        (p, v) => {
+            ++p.count;
+            p.Indpopularidad += v.popularidad * 5;
+            p.IndRelevancia += v.relevancia * 5;
+            return p;
+        },
+        /* callback for when data is removed from the current filter results */
+        (p, v) => {
+            --p.count;
+            p.Indpopularidad -= v.popularidad * 5;
+            p.IndRelevancia -= v.relevancia * 5;
+            return p;
+        },
+        /* initialize p */
+        () => ({
+            count: 0,
+            Indpopularidad: 0,
+            IndRelevancia: 0
+        })
+    );
 
 
 var minDate = new Date("01/01/2020");
@@ -252,9 +333,11 @@ burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         .transitionDuration(1500)
         .margins({top: 10, right: 50, bottom: 30, left: 40})
         .dimension(dateDimension)
+        .rangeChart(rangeChart) 
         //The bubble chart expects the groups are reduced to multiple values which are used
         //to generate x, y, and radius for each key (bubble) in the group
         .group(seleccion)      
+
         // (_optional_) define color function or array for bubbles: [ColorBrewer](http://colorbrewer2.org/)
        // .colors(d3.schemeRdYlGn[9])
         //(optional) define color domain to match your data domain if you want to bind data or color
@@ -325,9 +408,10 @@ burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         .transitionDuration(1500)
         .margins({top: 10, right: 50, bottom: 30, left: 40})
         .dimension(dateDimension2)
+        .rangeChart(rangeChart) 
         //The bubble chart expects the groups are reduced to multiple values which are used
         //to generate x, y, and radius for each key (bubble) in the group
-        .group(seleccion)      
+        .group(selecciondos)      
         // (_optional_) define color function or array for bubbles: [ColorBrewer](http://colorbrewer2.org/)
        // .colors(d3.schemeRdYlGn[9])
         //(optional) define color domain to match your data domain if you want to bind data or color
@@ -399,9 +483,10 @@ burbujaChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         .transitionDuration(1500)
         .margins({top: 10, right: 50, bottom: 30, left: 40})
         .dimension(dateDimension3)
+        .rangeChart(rangeChart) 
         //The bubble chart expects the groups are reduced to multiple values which are used
         //to generate x, y, and radius for each key (bubble) in the group
-        .group(seleccion)      
+        .group(selecciontres)      
         // (_optional_) define color function or array for bubbles: [ColorBrewer](http://colorbrewer2.org/)
        // .colors(d3.schemeRdYlGn[9])
         //(optional) define color domain to match your data domain if you want to bind data or color
